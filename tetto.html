@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetto - Payment Infrastructure for AI Agents | Ryan Smith</title>
+    <meta name="description" content="Payment infrastructure for autonomous AI agents. Live on Solana mainnet with 16 agents, 600+ transactions, and published TypeScript SDK.">
+    <link rel="icon" type="image/png" href="rsmith_logo.png" sizes="32x32">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-300: #cbd5e1;
+            --slate-400: #94a3b8;
+            --slate-500: #64748b;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --blue-500: #3b82f6;
+            --blue-600: #2563eb;
+            --cyan-500: #06b6d4;
+            --green-500: #10b981;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--slate-700);
+            background: var(--white);
+            font-feature-settings: 'cv11', 'ss01';
+            font-variant-numeric: tabular-nums;
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--slate-200);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--slate-900);
+            text-decoration: none;
+        }
+
+        .nav-brand img {
+            height: 32px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--slate-600);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--blue-600);
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 1rem;
+            }
+
+            .nav-brand img {
+                height: 24px;
+            }
+
+            .nav-link {
+                display: none;
+            }
+
+            .nav-links .btn {
+                display: block;
+            }
+
+            .back-link-fixed {
+                top: 5.5rem;
+                left: 1rem;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .back-link-fixed {
+            position: absolute;
+            top: 6.5rem;
+            left: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--slate-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+            z-index: 50;
+        }
+
+        .back-link-fixed:hover {
+            color: var(--blue-600);
+        }
+
+        .main {
+            padding-top: 5rem;
+        }
+
+        .hero {
+            padding: 4rem 0 6rem;
+            text-align: center;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--slate-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--blue-600);
+        }
+
+        .project-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--green-500);
+            color: var(--white);
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: var(--white);
+            flex-shrink: 0;
+        }
+
+        .hero-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--slate-900);
+            letter-spacing: -0.025em;
+            margin: 0;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--slate-600);
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--blue-500);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-600);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--slate-100);
+            color: var(--slate-700);
+            border: 1px solid var(--slate-200);
+        }
+
+        .btn-secondary:hover {
+            background: var(--slate-200);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto 4rem;
+            text-align: center;
+        }
+
+        .metric {
+            padding: 1.5rem;
+            background: var(--slate-50);
+            border-radius: 0.75rem;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--blue-600);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--slate-600);
+            font-weight: 500;
+        }
+
+        .section {
+            padding: 5rem 0;
+        }
+
+        .section-gray {
+            background: var(--slate-50);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--slate-900);
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--slate-600);
+            margin-bottom: 3rem;
+            text-align: center;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--slate-700);
+        }
+
+        .content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight-box {
+            background: var(--blue-50);
+            border-left: 4px solid var(--blue-500);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0.5rem;
+        }
+
+        .highlight-box h4 {
+            color: var(--blue-600);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .studios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .studio-card {
+            background: var(--white);
+            border: 1px solid var(--slate-200);
+            border-radius: 1rem;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            cursor: pointer;
+        }
+
+        .studio-card:hover {
+            border-color: var(--blue-500);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .studio-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .studio-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.125rem;
+            color: var(--white);
+            flex-shrink: 0;
+            overflow: hidden;
+            background: var(--white);
+        }
+
+        .studio-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+        }
+
+        .studio-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--slate-900);
+        }
+
+        .studio-meta {
+            font-size: 0.875rem;
+            color: var(--slate-500);
+            margin-top: 0.25rem;
+        }
+
+        .studio-description {
+            color: var(--slate-600);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .studio-features {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .studio-features li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--slate-700);
+            font-size: 0.9375rem;
+        }
+
+        .studio-features li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--blue-500);
+            font-weight: 700;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .tech-tag {
+            padding: 0.375rem 0.75rem;
+            background: var(--slate-100);
+            color: var(--slate-700);
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .features-list {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .features-list li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1.25rem;
+            color: var(--slate-700);
+            font-size: 1.0625rem;
+            line-height: 1.7;
+        }
+
+        .features-list li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--green-500);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title-wrapper {
+                gap: 0.75rem;
+            }
+
+            .hero-logo {
+                width: 48px;
+                height: 48px;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.25rem;
+            }
+
+            .hero-links {
+                flex-direction: column;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .studios-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div id="navbar-placeholder"></div>
+    <script src="navbar.js"></script>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-title-wrapper">
+                    <div class="hero-logo">
+                        <img src="tetto-icon.png" alt="Tetto">
+                    </div>
+                    <h1 class="hero-title">tetto.io</h1>
+                </div>
+
+                <p class="hero-subtitle">
+                    Payment infrastructure for autonomous AI agents
+                </p>
+
+                <div class="hero-links">
+                    <a href="https://tetto.io" class="btn btn-primary" target="_blank">
+                        View Live Platform →
+                    </a>
+                    <a href="https://www.npmjs.com/package/tetto-sdk" class="btn btn-secondary" target="_blank">
+                        <i class="fab fa-npm"></i> NPM Package
+                    </a>
+                    <a href="https://github.com/TettoLabs" class="btn btn-secondary" target="_blank">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                </div>
+
+                <!-- Key Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <div class="metric-value">16</div>
+                        <div class="metric-label">Agents Live</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">600+</div>
+                        <div class="metric-label">Mainnet Transactions</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">3</div>
+                        <div class="metric-label">Agent Studios</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">99.4%</div>
+                        <div class="metric-label">Test Pass Rate</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- What is Tetto -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">What is Tetto?</h2>
+                <p class="section-subtitle">
+                    The marketplace where AI agents discover, pay, and get paid for services
+                </p>
+
+                <div class="content">
+                    <p>
+                        Tetto is payment infrastructure for autonomous AI agents. Developers deploy agents to the
+                        marketplace that earn revenue when called. Built on Solana blockchain with USDC micropayments
+                        and on-chain proof of delivery.
+                    </p>
+
+                    <p>
+                        The platform handles all blockchain complexity - developers use one line of code to call agents.
+                        Payment routing, transaction signing, schema validation, and receipt generation all happen
+                        automatically.
+                    </p>
+
+                    <div class="highlight-box">
+                        <h4>First Proven AI-to-AI Economy</h4>
+                        <p style="margin: 0; color: var(--slate-700);">
+                            Coordinator agents autonomously call and pay other agents. CodeAuditPro orchestrates
+                            SecurityScanner + QualityAnalyzer with automatic payments - proving network effects work.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Blockchain -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">Why Blockchain?</h2>
+                <p class="section-subtitle">
+                    Technical practicality, not hype
+                </p>
+
+                <div class="content">
+                    <p>
+                        Blockchain isn't a trend choice - it solves two specific technical problems for AI agent payments:
+                    </p>
+
+                    <h3 style="font-size: 1.375rem; font-weight: 700; margin: 2rem 0 1rem; color: var(--slate-900);">
+                        1. Micropayments ($0.01 - $0.75 per call)
+                    </h3>
+                    <p>
+                        Traditional payment processors (Stripe, PayPal) charge 30¢ + 2.9% per transaction. A $0.10 agent call
+                        would cost $0.40 in fees - economically impossible. Solana transactions cost $0.00025, making
+                        micropayments viable. Agents can earn revenue on small, frequent calls.
+                    </p>
+
+                    <h3 style="font-size: 1.375rem; font-weight: 700; margin: 2rem 0 1rem; color: var(--slate-900);">
+                        2. Verifiable Service Receipts
+                    </h3>
+                    <p>
+                        When agents transact autonomously, both parties need cryptographic proof. We invented Verifiable
+                        Service Receipts - immutable on-chain records proving: who called, who was paid, what input was
+                        provided, what output was delivered, when it happened. No disputes, no chargebacks, no trust required.
+                    </p>
+
+                    <h3 style="font-size: 1.375rem; font-weight: 700; margin: 2rem 0 1rem; color: var(--slate-900);">
+                        3. Identity Without User Accounts
+                    </h3>
+                    <p>
+                        Traditional auth requires user accounts, passwords, OAuth flows - designed for humans, not autonomous agents.
+                        Web3 wallets combine identity and payment in a single cryptographic primitive. An AI agent with a wallet can
+                        call other agents, pay for services, even create new agents - all without user accounts or intermediaries.
+                        This enables true autonomy: agents that transact independently, not on behalf of humans.
+                    </p>
+
+                    <div class="highlight-box" style="background: var(--slate-50); border-left-color: var(--slate-700);">
+                        <h4 style="color: var(--slate-900);">Agents + Blockchain = Verifiably Trustable</h4>
+                        <p style="margin: 0; color: var(--slate-700);">
+                            Autonomous agents need verifiable transactions. Every Tetto transaction is cryptographically
+                            signed, immutably recorded, and independently auditable on Solana. This enables AI agents to
+                            transact with each other without human intermediaries - the foundation of an autonomous economy.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Three Studios -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">Three Agent Studios</h2>
+                <p class="section-subtitle">
+                    Built complete agent ecosystems to prove the platform
+                </p>
+
+                <div class="studios-grid">
+                    <!-- SubChain -->
+                    <a href="https://tetto.io/studios/subchain" class="studio-card" target="_blank">
+                        <div class="studio-header">
+                            <div class="studio-icon">
+                                <img src="subchain-icon.png" alt="SubChain">
+                            </div>
+                            <div>
+                                <div class="studio-title">SubChain.ai</div>
+                                <div class="studio-meta">11 Agents • 2 Coordinators • Verified ✓</div>
+                            </div>
+                        </div>
+                        <p class="studio-description">
+                            First verified studio on Tetto. Proves AI-to-AI economy with coordinators that autonomously
+                            call and pay sub-agents.
+                        </p>
+                        <ul class="studio-features">
+                            <li><strong>CodeAuditPro ($0.75):</strong> Orchestrates SecurityScanner + QualityAnalyzer in parallel</li>
+                            <li><strong>HunterHandler ($0.45):</strong> Parallel recruitment search coordinator</li>
+                            <li><strong>11 agents live:</strong> Summarizer, TitleGenerator, WalletInspector, FactChecker, SecurityScanner, QualityAnalyzer, HeadHunter, READMEWarrior, RealtyIQ</li>
+                            <li><strong>Proof:</strong> Coordinators process real USDC payments to sub-agents on mainnet</li>
+                        </ul>
+                    </a>
+
+                    <!-- MotherNode -->
+                    <a href="https://tetto.io/studios/mothernode" class="studio-card" target="_blank">
+                        <div class="studio-header">
+                            <div class="studio-icon">
+                                <img src="mothernode-icon.svg" alt="MotherNode">
+                            </div>
+                            <div>
+                                <div class="studio-title">MotherNode.ai</div>
+                                <div class="studio-meta">3 Agents • Agent Creation • DevNet</div>
+                            </div>
+                        </div>
+                        <p class="studio-description">
+                            Agent creation studio. Transforms ideas into working agents in 90 seconds with automated
+                            specification and implementation guide generation.
+                        </p>
+                        <ul class="studio-features">
+                            <li><strong>MotherSpec:</strong> Creates detailed agent specifications from descriptions</li>
+                            <li><strong>MotherGuide:</strong> Generates comprehensive implementation guides</li>
+                            <li><strong>MotherAgent:</strong> Coordinator orchestrating the full creation flow</li>
+                            <li><strong>Multi-network:</strong> DevNet operational, mainnet deployment pending</li>
+                        </ul>
+                    </a>
+
+                    <!-- WarmContext -->
+                    <a href="https://tetto.io/studios/warmcontext" class="studio-card" target="_blank">
+                        <div class="studio-header">
+                            <div class="studio-icon">
+                                <img src="warmcontext-icon.svg" alt="WarmContext">
+                            </div>
+                            <div>
+                                <div class="studio-title">WarmContext.ai</div>
+                                <div class="studio-meta">2 Agents • Memory Infrastructure</div>
+                            </div>
+                        </div>
+                        <p class="studio-description">
+                            Universal memory API for AI agents. Provides persistent context storage with Supabase
+                            backend and powers the WarmAnswers consumer application.
+                        </p>
+                        <ul class="studio-features">
+                            <li><strong>WarmMemory:</strong> Universal memory storage and retrieval for any AI agent</li>
+                            <li><strong>WarmAnswers:</strong> Q&A agent with context awareness</li>
+                            <li><strong>Architecture:</strong> Supabase backend with 3-table schema (memories, sources, tags)</li>
+                            <li><strong>Real usage:</strong> Powers WarmAnswers consumer SaaS application</li>
+                        </ul>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Innovations -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Key Innovations</h2>
+                <p class="section-subtitle">
+                    Technical breakthroughs that make Tetto unique
+                </p>
+
+                <div class="content">
+                    <ul class="features-list">
+                        <li>
+                            <strong>AI-to-AI Economy:</strong> First platform with proven autonomous agent-to-agent
+                            payments on blockchain. CodeAuditPro coordinator calls and pays SecurityScanner +
+                            QualityAnalyzer without human intervention.
+                        </li>
+                        <li>
+                            <strong>Platform-Powered Simplification:</strong> Reduced agent calling from 65 lines
+                            of blockchain code to 1 line. Platform handles RPC connections, transaction signing,
+                            schema validation, and receipt generation.
+                        </li>
+                        <li>
+                            <strong>HMAC Webhook Security:</strong> Industry-standard HMAC-SHA256 signature verification
+                            for agent endpoints (same pattern as Stripe/GitHub). Prevents unauthorized calls and
+                            ensures only paid requests are processed.
+                        </li>
+                        <li>
+                            <strong>Schema-Enforced I/O:</strong> JSON schema validation before payment. Invalid inputs
+                            are rejected before blockchain transaction, protecting both callers and agents.
+                        </li>
+                        <li>
+                            <strong>On-Chain Proof of Delivery:</strong> Every transaction generates immutable receipt
+                            on Solana. Full audit trail with explorer links for transparency.
+                        </li>
+                        <li>
+                            <strong>Multi-Environment Architecture:</strong> Same codebase serves mainnet + devnet
+                            with runtime network detection. Enables safe testing before production deployment.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">Technical Stack</h2>
+                <p class="section-subtitle">
+                    Production-grade infrastructure processing real payments
+                </p>
+
+                <div class="content">
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: var(--slate-900);">Platform</h3>
+                    <div class="tech-stack" style="max-width: 800px; margin: 0 auto 2rem;">
+                        <span class="tech-tag">Next.js 15</span>
+                        <span class="tech-tag">React 19</span>
+                        <span class="tech-tag">TypeScript</span>
+                        <span class="tech-tag">Tailwind CSS</span>
+                        <span class="tech-tag">Vercel</span>
+                    </div>
+
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: var(--slate-900);">Blockchain</h3>
+                    <div class="tech-stack" style="max-width: 800px; margin: 0 auto 2rem;">
+                        <span class="tech-tag">Solana</span>
+                        <span class="tech-tag">Web3.js</span>
+                        <span class="tech-tag">SPL Token</span>
+                        <span class="tech-tag">USDC</span>
+                        <span class="tech-tag">Client-side Signing</span>
+                    </div>
+
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: var(--slate-900);">Backend</h3>
+                    <div class="tech-stack" style="max-width: 800px; margin: 0 auto 2rem;">
+                        <span class="tech-tag">Supabase</span>
+                        <span class="tech-tag">PostgreSQL</span>
+                        <span class="tech-tag">Row-Level Security</span>
+                        <span class="tech-tag">Web3 Auth</span>
+                    </div>
+
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: var(--slate-900);">SDK & Tooling</h3>
+                    <div class="tech-stack" style="max-width: 800px; margin: 0 auto;">
+                        <span class="tech-tag">TypeScript SDK (published)</span>
+                        <span class="tech-tag">Python SDK</span>
+                        <span class="tech-tag">CLI Tool</span>
+                        <span class="tech-tag">HMAC-SHA256</span>
+                        <span class="tech-tag">178/179 Tests Passing</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Development Timeline -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Development</h2>
+                <p class="section-subtitle">
+                    October - November 2025
+                </p>
+
+                <div class="content">
+                    <p>
+                        Built complete platform in October-November 2025 while employed full-time at Charles Schwab.
+                        Started October 6, deployed to mainnet with real transactions within weeks.
+                    </p>
+
+                    <ul class="features-list">
+                        <li>
+                            <strong>15+ repositories:</strong> Platform, SDK, 3 agent studios, 3 landing pages,
+                            consumer app
+                        </li>
+                        <li>
+                            <strong>Multi-environment deployment:</strong> www.tetto.io (mainnet), dev.tetto.io (devnet),
+                            staging.tetto.io (testing)
+                        </li>
+                        <li>
+                            <strong>Complete ecosystem:</strong> Marketplace, SDKs, studios, agents, consumer app,
+                            documentation
+                        </li>
+                        <li>
+                            <strong>Production validation:</strong> 600+ real USDC transactions on Solana mainnet
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Back to Portfolio -->
+        <section class="section section-gray">
+            <div class="container" style="text-align: center;">
+                <a href="index.html" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> Back to All Projects
+                </a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

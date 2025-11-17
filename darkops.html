@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkOps - AI Governance Platform | Ryan Smith</title>
+    <meta name="description" content="AI governance platform with custom RAG system, 10-layer context assembly, and domain-aware agent specialization. Production-ready Flask blueprint architecture.">
+    <link rel="icon" type="image/png" href="rsmith_logo.png" sizes="32x32">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-300: #cbd5e1;
+            --slate-400: #94a3b8;
+            --slate-500: #64748b;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --blue-500: #3b82f6;
+            --blue-600: #2563eb;
+            --cyan-500: #06b6d4;
+            --green-500: #10b981;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--slate-700);
+            background: var(--white);
+            font-feature-settings: 'cv11', 'ss01';
+            font-variant-numeric: tabular-nums;
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--slate-200);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--slate-900);
+            text-decoration: none;
+        }
+
+        .nav-brand img {
+            height: 32px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--slate-600);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--blue-600);
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 1rem;
+            }
+
+            .nav-brand img {
+                height: 24px;
+            }
+
+            .nav-link {
+                display: none;
+            }
+
+            .nav-links .btn {
+                display: block;
+            }
+
+            .back-link-fixed {
+                top: 5.5rem;
+                left: 1rem;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .back-link-fixed {
+            position: absolute;
+            top: 6.5rem;
+            left: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--slate-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+            z-index: 50;
+        }
+
+        .back-link-fixed:hover {
+            color: var(--blue-600);
+        }
+
+        .main {
+            padding-top: 5rem;
+        }
+
+        .hero {
+            padding: 4rem 0 6rem;
+            text-align: center;
+        }
+
+        .hero-title-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: var(--white);
+            flex-shrink: 0;
+        }
+
+        .hero-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--slate-900);
+            letter-spacing: -0.025em;
+            margin: 0;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--slate-600);
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--blue-500);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-600);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--slate-100);
+            color: var(--slate-700);
+            border: 1px solid var(--slate-200);
+        }
+
+        .btn-secondary:hover {
+            background: var(--slate-200);
+        }
+
+        .section {
+            padding: 5rem 0;
+        }
+
+        .section-gray {
+            background: var(--slate-50);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--slate-900);
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--slate-600);
+            margin-bottom: 3rem;
+            text-align: center;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--slate-700);
+        }
+
+        .content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 2.5rem 0 1rem;
+            color: var(--slate-900);
+        }
+
+        .highlight-box {
+            background: var(--slate-50);
+            border-left: 4px solid var(--slate-700);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0.5rem;
+        }
+
+        .highlight-box h4 {
+            color: var(--slate-900);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .features-list {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .features-list li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1.25rem;
+            color: var(--slate-700);
+            font-size: 1.0625rem;
+            line-height: 1.7;
+        }
+
+        .features-list li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--blue-500);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .layers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .layer-card {
+            background: var(--white);
+            border: 1px solid var(--slate-200);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .layer-number {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--slate-500);
+            margin-bottom: 0.5rem;
+        }
+
+        .layer-name {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--slate-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .layer-description {
+            font-size: 0.9375rem;
+            color: var(--slate-600);
+            line-height: 1.6;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .tech-tag {
+            padding: 0.375rem 0.75rem;
+            background: var(--slate-100);
+            color: var(--slate-700);
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title-wrapper {
+                gap: 0.75rem;
+            }
+
+            .hero-logo {
+                width: 48px;
+                height: 48px;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.25rem;
+            }
+
+            .layers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div id="navbar-placeholder"></div>
+    <script src="navbar.js"></script>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-title-wrapper">
+                    <div class="hero-logo">
+                        <img src="DarkOps.png" alt="DarkOps">
+                    </div>
+                    <h1 class="hero-title">DarkOps</h1>
+                </div>
+
+                <p class="hero-subtitle">
+                    AI governance platform with custom RAG and domain-aware agent specialization
+                </p>
+            </div>
+        </section>
+
+        <!-- What is DarkOps -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">What is DarkOps?</h2>
+                <p class="section-subtitle">
+                    Custom RAG system for enterprise AI operations
+                </p>
+
+                <div class="content">
+                    <p>
+                        DarkOps is an AI governance platform with a custom retrieval-augmented generation (RAG) system.
+                        Built before RAG was mainstream, it solves the "context bleeding" problem - when AI gets confused
+                        mixing PostgreSQL context into Redis tasks, or security patterns into performance optimization.
+                    </p>
+
+                    <p>
+                        The platform uses a 10-layer context assembly architecture where each layer serves a specific
+                        purpose: base rules, domain knowledge, agent personality, invasiveness permissions, caution levels,
+                        specialized expertise, function patterns, field notes, and conversation history.
+                    </p>
+
+                    <div class="highlight-box">
+                        <h4>Built Using DIOS2</h4>
+                        <p style="margin: 0; color: var(--slate-700);">
+                            DarkOps was developed using the DIOS2 multi-agent system. Major implementations were orchestrated
+                            by specialized agents (Executives → Technical Lead → Intel Agent → Field Agents) with comprehensive
+                            tracking and verification at each stage.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent Tool Execution -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Agent Tool Execution</h2>
+                <p class="section-subtitle">
+                    AI agents with calibrated execution permissions
+                </p>
+
+                <div class="content">
+                    <p>
+                        DarkOps agents don't just return text responses - they execute operations on systems with calibrated
+                        permissions. Like Claude Code, but with enterprise safety controls designed for production environments.
+                    </p>
+
+                    <p>
+                        The invasiveness framework creates a permission system for AI tool use. Each agent's level determines
+                        which operations it can execute:
+                    </p>
+
+                    <ul class="features-list">
+                        <li><strong>SENTINEL:</strong> Read-only observation (query metrics, analyze logs, inspect configurations)</li>
+                        <li><strong>ANALYST:</strong> Suggestions without modification (recommend optimizations, identify issues)</li>
+                        <li><strong>TECHNICIAN:</strong> Minor system changes (restart services, clear caches, adjust settings)</li>
+                        <li><strong>OPERATIVE:</strong> Moderate changes (create database indexes, modify configurations, deploy updates)</li>
+                        <li><strong>INFILTRATOR:</strong> Significant changes (schema migrations, architecture changes, critical deployments)</li>
+                    </ul>
+
+                    <p>
+                        Combined with caution levels (Quartermaster → Diplomat → Ranger → Maverick → Ronin), this creates
+                        a two-dimensional framework for precise risk management. A TECHNICIAN with QUARTERMASTER caution makes
+                        careful, validated changes. An OPERATIVE with RONIN caution moves fast but can execute significant operations.
+                    </p>
+
+                    <div class="highlight-box">
+                        <h4>AI Safety Through Architecture</h4>
+                        <p style="margin: 0; color: var(--slate-700);">
+                            The specialization matrix solves AI safety for production environments. Instead of giving all agents
+                            full access or no access, DarkOps calibrates permissions based on task requirements. Database optimization
+                            needs an OPERATIVE. Log analysis only needs a SENTINEL. The architecture enforces these boundaries.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10-Layer Architecture -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">10-Layer Context Architecture</h2>
+                <p class="section-subtitle">
+                    Progressive context assembly for specialized AI responses
+                </p>
+
+                <div class="layers-grid">
+                    <div class="layer-card">
+                        <div class="layer-number">LAYER 1-2</div>
+                        <div class="layer-name">Foundation</div>
+                        <div class="layer-description">Base system rules and domain-specific concepts (DataOps, CodeOps, DocOps, LogOps)</div>
+                    </div>
+
+                    <div class="layer-card">
+                        <div class="layer-number">LAYER 3-4</div>
+                        <div class="layer-name">Task & Agent</div>
+                        <div class="layer-description">Action-specific frameworks and agent personality/communication style</div>
+                    </div>
+
+                    <div class="layer-card">
+                        <div class="layer-number">LAYER 5-6</div>
+                        <div class="layer-name">Behavior Control</div>
+                        <div class="layer-description">Invasiveness level (what can be modified) and caution level (decision-making approach)</div>
+                    </div>
+
+                    <div class="layer-card">
+                        <div class="layer-number">LAYER 7-8</div>
+                        <div class="layer-name">Specialized Knowledge</div>
+                        <div class="layer-description">Deep domain expertise and operational function patterns</div>
+                    </div>
+
+                    <div class="layer-card">
+                        <div class="layer-number">LAYER 9</div>
+                        <div class="layer-name">Field Notes</div>
+                        <div class="layer-description">Accumulated wisdom with effectiveness scoring and domain-aware filtering</div>
+                    </div>
+
+                    <div class="layer-card">
+                        <div class="layer-number">LAYER 10</div>
+                        <div class="layer-name">Conversation</div>
+                        <div class="layer-description">Historical context and continuity from previous interactions</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Innovations -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Key Technical Innovations</h2>
+                <p class="section-subtitle">
+                    Production engineering patterns and AI governance architecture
+                </p>
+
+                <div class="content">
+                    <ul class="features-list">
+                        <li>
+                            <strong>Dual-File Validation Workflow:</strong> Solves LLM content truncation problem through
+                            mathematical validation. Export creates locked reference + editable working copy. Validation
+                            compares both to detect truncation (>10% loss), corruption patterns, or structure damage.
+                            Only commits if validation passes - preventing AI hallucination from corrupting production data.
+                            Like write-ahead logging for AI edits.
+                        </li>
+                        <li>
+                            <strong>Domain-Aware Context Assembly:</strong> Solves context bleeding by filtering field notes
+                            based on domain scope. PostgreSQL tasks only get PostgreSQL context, preventing AI confusion
+                            from irrelevant information.
+                        </li>
+                        <li>
+                            <strong>Agent Specialization Matrix:</strong> Two-dimensional framework (Invasiveness × Caution)
+                            creates precise capability matching. Agents range from read-only Sentinels to system-modifying
+                            Infiltrators, with decision-making from cautious Quartermasters to fast-acting Ronins.
+                        </li>
+                        <li>
+                            <strong>Self-Improving Agents:</strong> Effectiveness scoring tracks which field notes produce
+                            successful outcomes. Adaptive learning thresholds adjust based on agent's learning velocity,
+                            enabling natural specialization emergence.
+                        </li>
+                        <li>
+                            <strong>Production Engineering Patterns:</strong> Circuit breaker pattern prevents cascade failures,
+                            3-tier caching (Redis → Memory → Database), transaction-aware cache invalidation, comprehensive
+                            audit logging.
+                        </li>
+                        <li>
+                            <strong>Multi-Layer Security:</strong> Template validation with regex blacklists, sandboxed execution,
+                            HMAC signatures, HTML sanitization, input size limits, pattern detection for injection attacks.
+                        </li>
+                        <li>
+                            <strong>Repository Pattern Architecture:</strong> Composition over inheritance with specialized
+                            repositories coordinating multiple base repositories. Clean separation with dictionary returns
+                            (not ORM objects) preventing session detachment.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">System Architecture</h2>
+                <p class="section-subtitle">
+                    4-layer stack with production-grade patterns
+                </p>
+
+                <div class="content">
+                    <h3>Data Access Layer</h3>
+                    <p>
+                        Repository pattern with composition over inheritance. MintedBaseRepository provides CRUD operations,
+                        specialized repositories (AgentRepository, CategoryRepository, ConversationRepository) coordinate
+                        multiple base repositories. Session management with circuit breakers, LRU cache eviction,
+                        transaction-aware invalidation.
+                    </p>
+
+                    <h3>Services Layer</h3>
+                    <p>
+                        Context Service orchestrates 10-layer assembly with intelligent token management. Template Renderer
+                        processes Jinja2 templates, Template Validator enforces security (no script injection, no eval),
+                        Token Optimizer reduces token usage 35-60% while preserving meaning. Async operations throughout
+                        for parallel layer fetching.
+                    </p>
+
+                    <h3>API Layer</h3>
+                    <p>
+                        Flask Blueprint architecture for modular organization. RESTful patterns with consistent response
+                        formats, multi-layer security (authentication → authorization → validation), comprehensive audit
+                        logging, graceful degradation with fail-safe defaults.
+                    </p>
+
+                    <h3>Intelligence Layer</h3>
+                    <p>
+                        Multi-note system with domain scope awareness. Performance metrics tracking (daily success rates,
+                        competency scores), context effectiveness events (learning from each conversation), optimization
+                        recommendations (self-improvement suggestions), failure-driven learning with adaptive thresholds.
+                    </p>
+
+                    <div class="highlight-box">
+                        <h4>Potential as MCP Server</h4>
+                        <p style="margin: 0; color: var(--slate-700);">
+                            DarkOps's architecture maps naturally to Model Context Protocol (MCP) servers. The 10-layer
+                            context assembly, domain-aware filtering, and effectiveness scoring could serve as an MCP
+                            context management server for AI coding assistants.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Stack -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">Technical Stack</h2>
+                <p class="section-subtitle">
+                    Production-ready Python/Flask architecture
+                </p>
+
+                <div class="content">
+                    <div class="tech-stack" style="max-width: 800px; margin: 0 auto 2rem;">
+                        <span class="tech-tag">Python 3.9+</span>
+                        <span class="tech-tag">Flask</span>
+                        <span class="tech-tag">SQLAlchemy 2.0</span>
+                        <span class="tech-tag">PostgreSQL</span>
+                        <span class="tech-tag">Redis</span>
+                        <span class="tech-tag">Jinja2</span>
+                        <span class="tech-tag">Async/Await</span>
+                    </div>
+
+                    <h3 style="text-align: center;">Patterns & Practices</h3>
+                    <div class="tech-stack" style="max-width: 800px; margin: 0 auto;">
+                        <span class="tech-tag">Repository Pattern</span>
+                        <span class="tech-tag">Circuit Breaker</span>
+                        <span class="tech-tag">3-Tier Caching</span>
+                        <span class="tech-tag">Blueprint Architecture</span>
+                        <span class="tech-tag">Transaction Management</span>
+                        <span class="tech-tag">LRU Eviction</span>
+                        <span class="tech-tag">HMAC Signatures</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lecture Series -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Documentation & Lectures</h2>
+                <p class="section-subtitle">
+                    Comprehensive architectural documentation
+                </p>
+
+                <div class="content">
+                    <p>
+                        Created detailed lecture series explaining the architecture from first principles. Each lecture
+                        uses metaphors (libraries, orchestras, theaters) to make complex systems understandable, then
+                        dives into technical implementation details.
+                    </p>
+
+                    <ul class="features-list">
+                        <li><strong>Lecture I - Data Access Layer:</strong> Repository pattern, session management, cache architecture, transaction handling</li>
+                        <li><strong>Lecture II - Services Layer:</strong> Context assembly, template rendering, token optimization, security validation</li>
+                        <li><strong>Lecture III - API Layer:</strong> Blueprint architecture, request flow, error handling, proxy pattern</li>
+                        <li><strong>Lecture V - Intelligence Layer:</strong> Multi-note system, domain awareness, adaptive learning, self-improvement</li>
+                        <li><strong>Winston Series:</strong> Platform vision, network effects, competitive moats, future of AI governance</li>
+                    </ul>
+
+                    <p>
+                        The lectures demonstrate technical communication ability - explaining sophisticated distributed
+                        systems architecture to varied audiences (developers, business leaders, architects).
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Demonstrated -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">Skills Demonstrated</h2>
+                <p class="section-subtitle">
+                    What employers will see in DarkOps
+                </p>
+
+                <div class="content">
+                    <ul class="features-list">
+                        <li><strong>Custom RAG Implementation:</strong> Built retrieval-augmented generation before it was mainstream, with domain-aware filtering and effectiveness scoring</li>
+                        <li><strong>Production Engineering:</strong> Circuit breakers, caching strategies, graceful degradation, comprehensive error handling</li>
+                        <li><strong>Security Engineering:</strong> Multi-layer validation, injection prevention, sandboxed execution, audit logging</li>
+                        <li><strong>Distributed Systems:</strong> 4-layer architecture with clean separation, async operations, state management</li>
+                        <li><strong>Platform Thinking:</strong> Flask blueprint pattern for embeddable integration, repository pattern for data access</li>
+                        <li><strong>Technical Writing:</strong> 27,000+ lines of comprehensive documentation with metaphors and examples</li>
+                        <li><strong>Systems Architecture:</strong> Designed for multi-tenancy, cross-organizational intelligence, platform evolution</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Back to Portfolio -->
+        <section class="section">
+            <div class="container" style="text-align: center;">
+                <a href="index.html" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> Back to All Projects
+                </a>
+                <a href="dios2.html" class="btn btn-secondary" style="margin-left: 1rem;">
+                    Learn About DIOS2 →
+                </a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

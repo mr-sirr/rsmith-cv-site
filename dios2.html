@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIOS2 - Multi-Agent Development System | Ryan Smith</title>
+    <meta name="description" content="Multi-agent orchestration system for software development. Hierarchical AI organization with Executives, Technical Lead, Intel Agent, and specialized Field Agents. Used to build DarkOps.">
+    <link rel="icon" type="image/png" href="rsmith_logo.png" sizes="32x32">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-300: #cbd5e1;
+            --slate-400: #94a3b8;
+            --slate-500: #64748b;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --blue-500: #3b82f6;
+            --blue-600: #2563eb;
+            --cyan-500: #06b6d4;
+            --green-500: #10b981;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--slate-700);
+            background: var(--white);
+            font-feature-settings: 'cv11', 'ss01';
+            font-variant-numeric: tabular-nums;
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--slate-200);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--slate-900);
+            text-decoration: none;
+        }
+
+        .nav-brand img {
+            height: 32px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--slate-600);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--blue-600);
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 1rem;
+            }
+
+            .nav-brand img {
+                height: 24px;
+            }
+
+            .nav-link {
+                display: none;
+            }
+
+            .nav-links .btn {
+                display: block;
+            }
+
+            .back-link-fixed {
+                top: 5.5rem;
+                left: 1rem;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .back-link-fixed {
+            position: absolute;
+            top: 6.5rem;
+            left: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--slate-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+            z-index: 50;
+        }
+
+        .back-link-fixed:hover {
+            color: var(--blue-600);
+        }
+
+        .main {
+            padding-top: 5rem;
+        }
+
+        .hero {
+            padding: 4rem 0 6rem;
+            text-align: center;
+        }
+
+        .hero-title-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: var(--white);
+            flex-shrink: 0;
+        }
+
+        .hero-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--slate-900);
+            letter-spacing: -0.025em;
+            margin: 0;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--slate-600);
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--blue-500);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-600);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--slate-100);
+            color: var(--slate-700);
+            border: 1px solid var(--slate-200);
+        }
+
+        .btn-secondary:hover {
+            background: var(--slate-200);
+        }
+
+        .section {
+            padding: 5rem 0;
+        }
+
+        .section-gray {
+            background: var(--slate-50);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--slate-900);
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--slate-600);
+            margin-bottom: 3rem;
+            text-align: center;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content {
+            max-width: 900px;
+            margin: 0 auto 3rem;
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--slate-700);
+        }
+
+        .content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 2.5rem 0 1rem;
+            color: var(--slate-900);
+        }
+
+        .highlight-box {
+            background: var(--slate-50);
+            border-left: 4px solid var(--slate-700);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0.5rem;
+        }
+
+        .highlight-box h4 {
+            color: var(--slate-900);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .hierarchy-diagram {
+            background: var(--white);
+            border: 1px solid var(--slate-200);
+            border-radius: 1rem;
+            padding: 3rem;
+            margin: 3rem auto;
+            max-width: 700px;
+        }
+
+        .hierarchy-level {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .hierarchy-level:last-child {
+            margin-bottom: 0;
+        }
+
+        .hierarchy-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--slate-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .hierarchy-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--slate-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .hierarchy-desc {
+            font-size: 0.9375rem;
+            color: var(--slate-600);
+        }
+
+        .hierarchy-arrow {
+            text-align: center;
+            color: var(--blue-500);
+            font-size: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .agent-card {
+            background: var(--white);
+            border: 1px solid var(--slate-200);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .agent-name {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--slate-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .agent-description {
+            font-size: 0.9375rem;
+            color: var(--slate-600);
+            line-height: 1.6;
+        }
+
+        .tracking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.875rem;
+            background: var(--white);
+            border: 1px solid var(--slate-200);
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .tracking-table th {
+            background: var(--slate-100);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            color: var(--slate-900);
+            border-bottom: 1px solid var(--slate-200);
+        }
+
+        .tracking-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--slate-100);
+            white-space: nowrap;
+        }
+
+        .tracking-table td:nth-child(2) {
+            white-space: normal;
+            min-width: 200px;
+        }
+
+        .tracking-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-complete {
+            color: var(--green-500);
+            font-weight: 600;
+        }
+
+        .status-progress {
+            color: var(--blue-500);
+            font-weight: 600;
+        }
+
+        .status-pending {
+            color: var(--slate-400);
+        }
+
+        .features-list {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .features-list li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1.25rem;
+            color: var(--slate-700);
+            font-size: 1.0625rem;
+            line-height: 1.7;
+        }
+
+        .features-list li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--blue-500);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title-wrapper {
+                gap: 0.75rem;
+            }
+
+            .hero-logo {
+                width: 48px;
+                height: 48px;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.25rem;
+            }
+
+            .hierarchy-diagram {
+                padding: 2rem 1.5rem;
+            }
+
+            .agents-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tracking-table {
+                font-size: 0.7rem;
+            }
+
+            .tracking-table th,
+            .tracking-table td {
+                padding: 0.75rem 0.4rem;
+            }
+
+            .tracking-table td:nth-child(2) {
+                min-width: 140px;
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div id="navbar-placeholder"></div>
+    <script src="navbar.js"></script>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-title-wrapper">
+                    <div class="hero-logo">
+                        <img src="Dios2.png" alt="DIOS2">
+                    </div>
+                    <h1 class="hero-title">DIOS2</h1>
+                </div>
+
+                <p class="hero-subtitle">
+                    Multi-agent development system for orchestrating software implementation
+                </p>
+            </div>
+        </section>
+
+        <!-- What is DIOS2 -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">What is DIOS2?</h2>
+                <p class="section-subtitle">
+                    Hierarchical AI organization for software development
+                </p>
+
+                <div class="content">
+                    <p>
+                        DIOS2 is a multi-agent orchestration framework that mirrors how real engineering organizations work.
+                        Instead of one AI doing everything, DIOS2 creates a hierarchy of specialized agents - from Executives
+                        setting strategy, to Technical Leads planning implementation, to Field Agents executing with verification.
+                    </p>
+
+                    <p>
+                        This isn't a demo or research project. DIOS2 was used to build DarkOps, with comprehensive
+                        tracking of every agent's work, timestamp logs, and verification at each stage.
+                    </p>
+
+                    <div class="highlight-box">
+                        <h4>Production Development System</h4>
+                        <p style="margin: 0; color: var(--slate-700);">
+                            DIOS2 isn't theory - it's how I actually develop software. Used to build DarkOps's complete
+                            multi-agent architecture: database schemas, repository layers, context services, and intelligence
+                            systems. Five major implementations orchestrated through specialized agents with comprehensive
+                            tracking and verification at each stage.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hierarchy -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">7-Layer AI Organization</h2>
+                <p class="section-subtitle">
+                    From executive strategy to implementation
+                </p>
+
+                <div class="hierarchy-diagram">
+                    <div class="hierarchy-level">
+                        <div class="hierarchy-label">Layer 1: Executives</div>
+                        <div class="hierarchy-title">CEO • CTO • CVO</div>
+                        <div class="hierarchy-desc">Set strategic direction, technical architecture, and innovation vision</div>
+                    </div>
+
+                    <div class="hierarchy-arrow">↓</div>
+
+                    <div class="hierarchy-level">
+                        <div class="hierarchy-label">Layer 2: Translation</div>
+                        <div class="hierarchy-title">Technical Lead</div>
+                        <div class="hierarchy-desc">Converts strategy into detailed implementation plans</div>
+                    </div>
+
+                    <div class="hierarchy-arrow">↓</div>
+
+                    <div class="hierarchy-level">
+                        <div class="hierarchy-label">Layer 3: Enrichment</div>
+                        <div class="hierarchy-title">Intel Agent</div>
+                        <div class="hierarchy-desc">Adds domain context, creates dependency graphs</div>
+                    </div>
+
+                    <div class="hierarchy-arrow">↓</div>
+
+                    <div class="hierarchy-level">
+                        <div class="hierarchy-label">Layer 4: Specialization</div>
+                        <div class="hierarchy-title">Analyst Handler</div>
+                        <div class="hierarchy-desc">Creates domain-specific analysts on-demand</div>
+                    </div>
+
+                    <div class="hierarchy-arrow">↓</div>
+
+                    <div class="hierarchy-level">
+                        <div class="hierarchy-label">Layers 5-7: Field Agents</div>
+                        <div class="hierarchy-title">7 Specialized Agents</div>
+                        <div class="hierarchy-desc">Execute implementation with multi-layer verification</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Field Agents -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">Field Agent Workflow</h2>
+                <p class="section-subtitle">
+                    Complete implementation cycle with verification at every stage
+                </p>
+
+                <div class="agents-grid">
+                    <div class="agent-card">
+                        <div class="agent-name">CIPHER_AGENT</div>
+                        <div class="agent-description">
+                            Bookend agent that initializes each subphase, performs verification checks, and manages
+                            phase completion. Ensures state preservation across implementations.
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-name">PLANNER</div>
+                        <div class="agent-description">
+                            Strategic decomposition of requirements into actionable tasks with clear assignments,
+                            dependencies, and success criteria.
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-name">CODER</div>
+                        <div class="agent-description">
+                            Backend implementation specialist for data processing, APIs, and non-UI components.
+                            Handles database schemas, services, and business logic.
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-name">UX_WIZARD</div>
+                        <div class="agent-description">
+                            Frontend implementation specialist for user interfaces, flows, and accessibility.
+                            Handles UI components and user experience.
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-name">TESTER</div>
+                        <div class="agent-description">
+                            Verification specialist for functional testing, regression testing, and edge case
+                            validation. Creates comprehensive test suites.
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-name">DEEPVERIFY</div>
+                        <div class="agent-description">
+                            Advanced verification for security vulnerabilities, performance bottlenecks, and
+                            architectural compliance. Multi-dimensional quality assurance.
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-name">COMMITTER</div>
+                        <div class="agent-description">
+                            Final quality gate for documentation completeness, integration validation, and handoff
+                            preparation. Manages version control.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content">
+                    <p style="text-align: center; color: var(--slate-600); font-style: italic;">
+                        Each subphase flows: CIPHER (init) → PLANNER → CODER/UX_WIZARD → TESTER → DEEPVERIFY → COMMITTER → CIPHER (complete)
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Proof It Works -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Proof: DarkOps Implementation</h2>
+                <p class="section-subtitle">
+                    Real tracking data from DIOS2-orchestrated development
+                </p>
+
+                <div class="content">
+                    <p>
+                        DarkOps's multi-agent architecture was built using DIOS2 orchestration. Five major implementations
+                        (database schemas, containerization, repository layers, context templates, 10-layer architecture)
+                        were completed through the full agent workflow with comprehensive tracking.
+                    </p>
+
+                    <div style="overflow-x: auto; margin: 2rem 0;">
+                        <table class="tracking-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Implementation</th>
+                                    <th>CIPHER (Init)</th>
+                                    <th>Planning</th>
+                                    <th>Implementation</th>
+                                    <th>Testing</th>
+                                    <th>DeepVerify</th>
+                                    <th>Documentation</th>
+                                    <th>CIPHER (Complete)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Database Schema Extension</td>
+                                    <td class="status-complete">✅ 05-21</td>
+                                    <td class="status-complete">✅ 05-21</td>
+                                    <td class="status-complete">✅ 05-22</td>
+                                    <td class="status-complete">✅ 05-22</td>
+                                    <td class="status-complete">✅ 05-22</td>
+                                    <td class="status-complete">✅ 05-22</td>
+                                    <td class="status-complete">✅ 05-22</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Containerization & Service Isolation</td>
+                                    <td class="status-complete">✅ 05-23</td>
+                                    <td class="status-complete">✅ 05-23</td>
+                                    <td class="status-complete">✅ 05-24</td>
+                                    <td class="status-complete">✅ 05-24</td>
+                                    <td class="status-complete">✅ 05-24</td>
+                                    <td class="status-complete">✅ 05-24</td>
+                                    <td class="status-complete">✅ 05-19</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Repository and Service Layer</td>
+                                    <td class="status-complete">✅ 05-22</td>
+                                    <td class="status-complete">✅ 05-22</td>
+                                    <td class="status-complete">✅ 05-23</td>
+                                    <td class="status-complete">✅ 05-26</td>
+                                    <td class="status-complete">✅ 05-21</td>
+                                    <td class="status-complete">✅ 05-26</td>
+                                    <td class="status-complete">✅ 05-26</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>Agent Context Template Creation</td>
+                                    <td class="status-complete">✅ 05-21</td>
+                                    <td class="status-complete">✅ 05-21</td>
+                                    <td class="status-complete">✅ 05-21</td>
+                                    <td class="status-complete">✅ 05-22</td>
+                                    <td class="status-complete">✅ 05-22</td>
+                                    <td class="status-complete">✅ 05-22</td>
+                                    <td class="status-complete">✅ 05-22</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>10-Layer Context Architecture</td>
+                                    <td class="status-complete">✅ 05-26</td>
+                                    <td class="status-complete">✅ 05-27</td>
+                                    <td class="status-complete">✅ 05-28</td>
+                                    <td class="status-progress">🔄 In Progress</td>
+                                    <td class="status-pending">⬜️ Pending</td>
+                                    <td class="status-pending">⬜️ Pending</td>
+                                    <td class="status-pending">⬜️ Pending</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p style="font-size: 0.9375rem; color: var(--slate-600); text-align: center;">
+                        Each checkmark represents a completed agent verification. Dates show actual implementation timeline.
+                        This tracking table is from real development - each phase was orchestrated through CIPHER → PLANNER →
+                        CODER → TESTER → DEEPVERIFY → COMMITTER → CIPHER with full state management.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Standardized Interfaces -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">Standardized Agent Interfaces</h2>
+                <p class="section-subtitle">
+                    Consistent interaction patterns across all agents
+                </p>
+
+                <div class="content">
+                    <ul class="features-list">
+                        <li>
+                            <strong>AMA (Ask Me Anything):</strong> Question-answering for each agent's domain expertise.
+                            Example: "AMA TESTER: How do I test authentication systems?"
+                        </li>
+                        <li>
+                            <strong>DO (Execute):</strong> Task execution requests for specific agents.
+                            Example: "DO PLANNER: Create implementation plan for login feature"
+                        </li>
+                        <li>
+                            <strong>CXT (Context):</strong> Context management and knowledge synchronization.
+                            Example: "CXT SYNC CEO CTO" to share strategic context
+                        </li>
+                        <li>
+                            <strong>HELP:</strong> Documentation and usage assistance for each agent.
+                            Example: "HELP CODER" for implementation guidance
+                        </li>
+                        <li>
+                            <strong>EXPLAIN:</strong> Request explanations about processes, decisions, or artifacts.
+                            Example: "EXPLAIN DEEPVERIFY: Why was this security approach chosen?"
+                        </li>
+                        <li>
+                            <strong>CALL:</strong> Orchestration command that activates the next appropriate agent in workflow.
+                            Automatically selects based on phase status and task assignments.
+                        </li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Command Protocol Architecture</h4>
+                        <p style="margin: 0; color: var(--slate-700);">
+                            The standardized interfaces create predictable interaction patterns. Each agent understands
+                            the same command format, enabling automated orchestration and human intervention at any point.
+                            This is infrastructure for AI collaboration at scale.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Capabilities -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Key Technical Capabilities</h2>
+                <p class="section-subtitle">
+                    What makes DIOS2 a production system
+                </p>
+
+                <div class="content">
+                    <ul class="features-list">
+                        <li>
+                            <strong>State Management:</strong> File-based communication with transaction-aware state preservation.
+                            Each agent documents work in standardized formats, enabling handoffs and rollbacks.
+                        </li>
+                        <li>
+                            <strong>Human-in-Loop:</strong> Explicit integration points marked with 👤 indicator. System waits
+                            for human approval at critical transitions (UI validation, business logic, edge cases).
+                        </li>
+                        <li>
+                            <strong>Emergency Protocols:</strong> ROLLBACK command reverts to previous state, EMERGENCY command
+                            pauses workflows and preserves state, conflict resolution with escalation to human operators.
+                        </li>
+                        <li>
+                            <strong>Multi-Phase Coordination:</strong> Tracks dependencies between subphases, maintains overall
+                            phase context, enables complex implementations broken into manageable units.
+                        </li>
+                        <li>
+                            <strong>Comprehensive Documentation:</strong> 27,000+ lines of framework documentation. Each agent
+                            has detailed context defining role, capabilities, decision framework, and integration points.
+                        </li>
+                        <li>
+                            <strong>Reinstantiation Procedures:</strong> Framework can be reinstantiated while preserving all
+                            reports and artifacts. Complete backup and restore mechanisms for production continuity.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Demonstrated -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">What DIOS2 Demonstrates</h2>
+                <p class="section-subtitle">
+                    Technical depth beyond typical software engineering
+                </p>
+
+                <div class="content">
+                    <ul class="features-list">
+                        <li>
+                            <strong>Distributed Systems Architecture:</strong> Designed hierarchical coordination system with
+                            7 layers of agent specialization, standardized protocols, and state management.
+                        </li>
+                        <li>
+                            <strong>AI Orchestration:</strong> Built multi-agent coordination with handoffs, verification,
+                            and human oversight. Solved agent communication and state preservation.
+                        </li>
+                        <li>
+                            <strong>Production System Design:</strong> Created emergency protocols, rollback mechanisms,
+                            reinstantiation procedures - production-grade engineering for AI systems.
+                        </li>
+                        <li>
+                            <strong>Technical Communication:</strong> 27K+ lines of documentation with metaphors, diagrams,
+                            and examples. Shows ability to explain complex systems clearly.
+                        </li>
+                        <li>
+                            <strong>Systems Thinking:</strong> Designed how AI organizations should work at scale, not just
+                            how to build features. This is principal/staff engineer level architecture.
+                        </li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Beyond Feature Development</h4>
+                        <p style="margin: 0; color: var(--slate-700);">
+                            DIOS2 shows architectural thinking at organizational scale. Most engineers build features.
+                            This demonstrates ability to design how entire AI-powered organizations should operate -
+                            the kind of systems thinking required for staff/principal engineer roles.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Documentation -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Framework Documentation</h2>
+                <p class="section-subtitle">
+                    Comprehensive specifications and guides
+                </p>
+
+                <div class="content">
+                    <p>
+                        DIOS2 includes extensive documentation covering every aspect of the multi-agent system:
+                    </p>
+
+                    <ul class="features-list">
+                        <li><strong>Executive Frameworks:</strong> CEO, CTO, CVO specifications with personality contexts, command interfaces, and integration patterns</li>
+                        <li><strong>Field Agent Framework:</strong> Complete profile for 7-agent workflow with roles, specializations, and handoff protocols</li>
+                        <li><strong>Technical Lead Guide:</strong> Implementation plan creation, analyst coordination, and enrichment procedures</li>
+                        <li><strong>Intel Agent Specs:</strong> Context enrichment, dependency analysis, and field agent integration</li>
+                        <li><strong>Human Operator Guide:</strong> Usage steps, integration points, command reference, emergency protocols</li>
+                        <li><strong>API Transition Plan:</strong> Evolution path from Claude Code simulation to dedicated API services</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Back to Portfolio -->
+        <section class="section section-gray">
+            <div class="container" style="text-align: center;">
+                <a href="darkops.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to DarkOps
+                </a>
+                <a href="index.html" class="btn btn-primary" style="margin-left: 1rem;">
+                    Back to All Projects
+                </a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

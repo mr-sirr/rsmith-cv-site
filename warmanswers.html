@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WarmAnswers - Personal AI Knowledge Platform | Ryan Smith</title>
+    <meta name="description" content="Personal AI knowledge management platform with subscription billing. Complete Next.js SaaS application with Supabase authentication and Stripe integration.">
+    <link rel="icon" type="image/png" href="rsmith_logo.png" sizes="32x32">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-300: #cbd5e1;
+            --slate-400: #94a3b8;
+            --slate-500: #64748b;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --blue-500: #3b82f6;
+            --blue-600: #2563eb;
+            --warm-red: #ef4444;
+            --warm-light: #f87171;
+            --green-500: #10b981;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--slate-700);
+            background: var(--white);
+            font-feature-settings: 'cv11', 'ss01';
+            font-variant-numeric: tabular-nums;
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--slate-200);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--slate-900);
+            text-decoration: none;
+        }
+
+        .nav-brand img {
+            height: 32px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--slate-600);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--blue-600);
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 1rem;
+            }
+
+            .nav-brand img {
+                height: 24px;
+            }
+
+            .nav-link {
+                display: none;
+            }
+
+            .nav-links .btn {
+                display: block;
+            }
+
+            .back-link-fixed {
+                top: 5.5rem;
+                left: 1rem;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .back-link-fixed {
+            position: absolute;
+            top: 6.5rem;
+            left: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--slate-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+            z-index: 50;
+        }
+
+        .back-link-fixed:hover {
+            color: var(--blue-600);
+        }
+
+        .main {
+            padding-top: 5rem;
+        }
+
+        .hero {
+            padding: 4rem 0 6rem;
+            text-align: center;
+        }
+
+        .hero-title-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: var(--white);
+            flex-shrink: 0;
+        }
+
+        .hero-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--slate-900);
+            letter-spacing: -0.025em;
+            margin: 0;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--slate-600);
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--blue-500);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-600);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--slate-100);
+            color: var(--slate-700);
+            border: 1px solid var(--slate-200);
+        }
+
+        .btn-secondary:hover {
+            background: var(--slate-200);
+        }
+
+        .section {
+            padding: 5rem 0;
+        }
+
+        .section-gray {
+            background: var(--slate-50);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--slate-900);
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--slate-600);
+            margin-bottom: 3rem;
+            text-align: center;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content {
+            max-width: 900px;
+            margin: 0 auto 3rem;
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--slate-700);
+        }
+
+        .content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight-box {
+            background: var(--slate-50);
+            border-left: 4px solid var(--warm-red);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0.5rem;
+        }
+
+        .highlight-box h4 {
+            color: var(--slate-900);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .features-list {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .features-list li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1.25rem;
+            color: var(--slate-700);
+            font-size: 1.0625rem;
+            line-height: 1.7;
+        }
+
+        .features-list li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--warm-red);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .tech-tag {
+            padding: 0.375rem 0.75rem;
+            background: var(--slate-100);
+            color: var(--slate-700);
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title-wrapper {
+                gap: 0.75rem;
+            }
+
+            .hero-logo {
+                width: 48px;
+                height: 48px;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.25rem;
+            }
+
+            .hero-links {
+                flex-direction: column;
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div id="navbar-placeholder"></div>
+    <script src="navbar.js"></script>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-title-wrapper">
+                    <div class="hero-logo">
+                        <img src="warmanswers-svg.svg" alt="WarmAnswers">
+                    </div>
+                    <h1 class="hero-title">WarmAnswers</h1>
+                </div>
+
+                <p class="hero-subtitle">
+                    Personal AI knowledge management platform
+                </p>
+
+                <div class="hero-links">
+                    <a href="https://www.warmanswers.com" class="btn btn-primary" target="_blank">
+                        Visit WarmAnswers →
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- What is WarmAnswers -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">Your memory, searchable.</h2>
+                <p class="section-subtitle">
+                    One simple place that remembers everything you tell it
+                </p>
+
+                <div class="content">
+                    <p style="font-size: 1.25rem; text-align: center; color: var(--slate-600); max-width: 600px; margin: 0 auto 3rem;">
+                        Store what matters. Ask questions. Get instant answers from your own knowledge.
+                        No folders, no setup, just a search bar.
+                    </p>
+
+                    <p>
+                        WarmAnswers is personal AI with memory. Tell it anything - passwords, preferences, facts you want
+                        to remember. Later, ask questions and it retrieves answers from what you've stored. Your knowledge,
+                        always accessible.
+                    </p>
+
+                    <p>
+                        Built on WarmContext agents via Tetto marketplace. Demonstrates complete vertical integration:
+                        infrastructure (Tetto) → agents (WarmContext) → consumer product (WarmAnswers).
+                    </p>
+
+                    <div class="highlight-box">
+                        <h4>Product Restraint</h4>
+                        <p style="margin: 0; color: var(--slate-700);">
+                            While Tetto, DarkOps, and DIOS2 showcase technical complexity, WarmAnswers shows product discipline.
+                            Consumer applications need clarity, not features. Sometimes the hardest thing to build is simple.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Features -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Product Features</h2>
+                <p class="section-subtitle">
+                    Complete SaaS application with subscription billing
+                </p>
+
+                <div class="content">
+                    <ul class="features-list">
+                        <li>
+                            <strong>Supabase Authentication:</strong> Email/password authentication with session management,
+                            password reset flows, and secure user management.
+                        </li>
+                        <li>
+                            <strong>Stripe Billing Integration:</strong> Subscription plans ($3/month individual, $5/month couples)
+                            with automated billing, payment method management, and subscription lifecycle.
+                        </li>
+                        <li>
+                            <strong>Personalized Dashboards:</strong> User-specific interfaces with "{FirstName}'s Memory" branding,
+                            custom memory organization, and personalized Q&A history.
+                        </li>
+                        <li>
+                            <strong>WarmContext Agent Backend:</strong> Powered by WarmMemory and WarmAnswers agents via Tetto
+                            marketplace. Demonstrates infrastructure → consumer product integration.
+                        </li>
+                        <li>
+                            <strong>Email Templates:</strong> Branded transactional emails for auth, billing, and notifications.
+                            Complete user communication system.
+                        </li>
+                        <li>
+                            <strong>40+ React Components:</strong> Complete UI component library with forms, dashboards,
+                            navigation, modals, and responsive layouts.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Implementation -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">Technical Implementation</h2>
+                <p class="section-subtitle">
+                    Smart architecture beyond generic SaaS tutorials
+                </p>
+
+                <div class="content">
+                    <ul class="features-list">
+                        <li>
+                            <strong>Intent Analyzer:</strong> Uses Claude Haiku with temperature=0 for deterministic intent
+                            classification (teach, update, ask, forget). Offloads classification to LLM instead of brittle
+                            regex patterns. ~200ms classification speed, ~$0.001 per analysis.
+                        </li>
+                        <li>
+                            <strong>Undo Manager:</strong> Complete undo system with 1-hour expiry tokens stored in Supabase.
+                            Preserves full memory state (question, answer, tags) for restoration. Simpler than Redis for v1.0
+                            while maintaining production capability.
+                        </li>
+                        <li>
+                            <strong>Pattern Cache:</strong> Intelligent response caching with invalidation on memory updates.
+                            Reduces repeated LLM calls for similar questions while ensuring fresh data.
+                        </li>
+                        <li>
+                            <strong>Tag Generator:</strong> Auto-generates semantic tags from memory content for organization
+                            and retrieval. Uses LLM to extract meaningful categorization.
+                        </li>
+                        <li>
+                            <strong>Trial System:</strong> Complete trial management with countdown display, paywall enforcement,
+                            and subscription conversion flows. Fixed critical revenue bug where frontend ignored backend paywall.
+                        </li>
+                    </ul>
+
+                    <p style="text-align: center; color: var(--slate-600); margin-top: 3rem; font-style: italic;">
+                        Complete custom implementation - not a tutorial clone. Intent classification, undo system,
+                        pattern caching, auto-tagging, trial management, and personalized UX built from scratch.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Stack -->
+        <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">Technical Stack</h2>
+                <p class="section-subtitle">
+                    Modern full-stack SaaS architecture
+                </p>
+
+                <div class="content">
+                    <div class="tech-stack" style="max-width: 800px; margin: 0 auto;">
+                        <span class="tech-tag">Next.js</span>
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">TypeScript</span>
+                        <span class="tech-tag">Tailwind CSS</span>
+                        <span class="tech-tag">Supabase</span>
+                        <span class="tech-tag">PostgreSQL</span>
+                        <span class="tech-tag">Stripe</span>
+                        <span class="tech-tag">Claude API</span>
+                        <span class="tech-tag">Vercel</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- What This Demonstrates -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">What WarmAnswers Demonstrates</h2>
+                <p class="section-subtitle">
+                    Consumer product capabilities beyond infrastructure
+                </p>
+
+                <div class="content">
+                    <ul class="features-list">
+                        <li>
+                            <strong>B2C Product Development:</strong> Built complete consumer application with authentication,
+                            billing, and personalized UX - not just APIs or infrastructure.
+                        </li>
+                        <li>
+                            <strong>Subscription Business Model:</strong> Implemented Stripe integration with multiple pricing
+                            tiers, payment flows, and subscription management.
+                        </li>
+                        <li>
+                            <strong>Full-Stack Capability:</strong> Frontend (React/Next.js), backend (Supabase/PostgreSQL),
+                            payments (Stripe), deployment (Vercel) - complete ownership.
+                        </li>
+                        <li>
+                            <strong>Vertical Integration:</strong> Built infrastructure (Tetto), agents (WarmContext), and
+                            consumer product (WarmAnswers) - proving the entire stack works together.
+                        </li>
+                        <li>
+                            <strong>Production SaaS:</strong> Not a demo - real authentication, real payments, real users.
+                            Shows ability to ship consumer-facing products.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Back to Portfolio -->
+        <section class="section section-gray">
+            <div class="container" style="text-align: center;">
+                <a href="index.html" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> Back to All Projects
+                </a>
+                <a href="tetto.html" class="btn btn-secondary" style="margin-left: 1rem;">
+                    Learn About Tetto →
+                </a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -448,6 +448,41 @@
             </div>
         </section>
 
+        <!-- Mission Analyst Meta-Cognitive Loop -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Mission Analyst Meta-Cognitive Loop</h2>
+                <p class="section-subtitle">
+                    AI that analyzes its own performance and suggests improvements
+                </p>
+
+                <div class="content">
+                    <p>
+                        After each conversation, a specialized mission analyst agent reviews the interaction,
+                        maps user feedback to specific context layer gaps, and generates exact recommendations
+                        for improvement. This is self-improving AI without RLHF.
+                    </p>
+
+                    <ul class="features-list">
+                        <li><strong>Layer-Specific Diagnosis:</strong> "Layer 3: Create Script lacks error handling at line 45" (not generic "improve prompts")</li>
+                        <li><strong>Tool Execution Analysis:</strong> Detects failed commands, maps to context instruction errors</li>
+                        <li><strong>Fast Feedback Loop:</strong> 30 seconds after conversation (vs weeks for A/B testing)</li>
+                        <li><strong>Cost-Effective:</strong> $0.02 per analysis (vs $10,000+ for RLHF fine-tuning)</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <h4>Self-Improving Intelligence</h4>
+                        <p style="margin: 0; color: var(--slate-700);">
+                            The meta-cognitive loop enables the system to identify its own blind spots and suggest fixes.
+                            Mission analyst recommendations become context updates, improving all future conversations.
+                            This is continuous improvement at scale - 1,000 conversations/day × $0.02 = $20/day
+                            vs hiring prompt engineers at $100/hr.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Agent Tool Execution -->
         <section class="section">
             <div class="container">
@@ -493,8 +528,45 @@
             </div>
         </section>
 
-        <!-- 10-Layer Architecture -->
+        <!-- Enterprise AI Governance -->
         <section class="section section-gray">
+            <div class="container">
+                <h2 class="section-title">Enterprise AI Governance</h2>
+                <p class="section-subtitle">
+                    Role-based AI capabilities for production environments
+                </p>
+
+                <div class="content">
+                    <p>
+                        DarkOps implements enterprise AI governance through conditional tool provisioning -
+                        the first platform to enforce role-based AI capabilities. Junior staff get safe AI
+                        (Technician level - can read but not modify), senior architects get powerful AI
+                        (Operative level - can modify system intelligence).
+                    </p>
+
+                    <div class="highlight-box">
+                        <h4>YC Demo: Watch AI Governance in Action</h4>
+                        <p style="margin: 0; color: var(--slate-700);">
+                            <strong>Scenario 1:</strong> Nulla (Technician) attempts context update →
+                            Gets read-only access → Shows governance restriction<br>
+                            <strong>Scenario 2:</strong> Ewen (Operative) updates context successfully →
+                            Changes propagate via 4-tier cache invalidation → Next conversation uses
+                            improved intelligence → Shows meta-cognitive capabilities with immediate effect
+                        </p>
+                    </div>
+
+                    <ul class="features-list">
+                        <li><strong>Conditional Tool Provisioning:</strong> Tools dynamically provided based on invasiveness level</li>
+                        <li><strong>Server-Side Authorization:</strong> Technicians can't escalate privileges even if they try</li>
+                        <li><strong>Audit Logging:</strong> Full change tracking for compliance (SOC2, HIPAA ready)</li>
+                        <li><strong>Immediate Effect:</strong> Context updates propagate via 4-tier cache invalidation</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10-Layer Architecture -->
+        <section class="section">
             <div class="container">
                 <h2 class="section-title">10-Layer Context Architecture</h2>
                 <p class="section-subtitle">
@@ -505,7 +577,7 @@
                     <div class="layer-card">
                         <div class="layer-number">LAYER 1-2</div>
                         <div class="layer-name">Foundation</div>
-                        <div class="layer-description">Base system rules and domain-specific concepts (DataOps, CodeOps, DocOps, LogOps)</div>
+                        <div class="layer-description">Base system rules and 5 specialized categories: DataOps (data engineering), CodeOps (software ops), DocOps (documentation), LogOps (logging/monitoring), and IntelOps (meta-cognitive - agents that improve other agents' intelligence)</div>
                     </div>
 
                     <div class="layer-card">
@@ -542,7 +614,7 @@
         </section>
 
         <!-- Key Innovations -->
-        <section class="section">
+        <section class="section section-gray">
             <div class="container">
                 <h2 class="section-title">Key Technical Innovations</h2>
                 <p class="section-subtitle">
@@ -552,11 +624,12 @@
                 <div class="content">
                     <ul class="features-list">
                         <li>
-                            <strong>Dual-File Validation Workflow:</strong> Solves LLM content truncation problem through
-                            mathematical validation. Export creates locked reference + editable working copy. Validation
-                            compares both to detect truncation (>10% loss), corruption patterns, or structure damage.
-                            Only commits if validation passes - preventing AI hallucination from corrupting production data.
-                            Like write-ahead logging for AI edits.
+                            <strong>Dual-File Validation Workflow:</strong> Solves critical LLM truncation problem through
+                            programmatic validation. Despite 35,229 characters of explicit instructions, LLMs truncate large
+                            content 30-40% of the time with '[Rest remains same]' placeholders. Export creates locked reference
+                            + editable working copy, LLM performs native file operations, then validation compares both to detect
+                            truncation (>10% loss), corruption patterns, or structure damage. <strong>Zero truncation failures
+                            in production</strong> (100+ updates tested). Engineering solution to fundamental LLM limitation.
                         </li>
                         <li>
                             <strong>Domain-Aware Context Assembly:</strong> Solves context bleeding by filtering field notes
@@ -565,8 +638,11 @@
                         </li>
                         <li>
                             <strong>Agent Specialization Matrix:</strong> Two-dimensional framework (Invasiveness × Caution)
-                            creates precise capability matching. Agents range from read-only Sentinels to system-modifying
-                            Infiltrators, with decision-making from cautious Quartermasters to fast-acting Ronins.
+                            creates precise capability matching. 17 base templates dynamically compose to generate 120 unique
+                            agent configurations, achieving 60-70% token savings vs monolithic prompts. Agents share base layers,
+                            only specialize deltas - surgical updates fix one template, 15 agents benefit instantly. Agents range
+                            from read-only Sentinels to system-modifying Infiltrators, with decision-making from cautious
+                            Quartermasters to fast-acting Ronins.
                         </li>
                         <li>
                             <strong>Self-Improving Agents:</strong> Effectiveness scoring tracks which field notes produce
@@ -575,8 +651,9 @@
                         </li>
                         <li>
                             <strong>Production Engineering Patterns:</strong> Circuit breaker pattern prevents cascade failures,
-                            3-tier caching (Redis → Memory → Database), transaction-aware cache invalidation, comprehensive
-                            audit logging.
+                            4-tier caching architecture (Service Layer → Repository Layer → Database Static Cache → Redis Distributed Cache)
+                            achieving 90%+ cache hit rate with 36-48ms average context assembly, transaction-aware cache invalidation,
+                            comprehensive audit logging.
                         </li>
                         <li>
                             <strong>Multi-Layer Security:</strong> Template validation with regex blacklists, sandboxed execution,
@@ -666,7 +743,7 @@
                     <div class="tech-stack" style="max-width: 800px; margin: 0 auto;">
                         <span class="tech-tag">Repository Pattern</span>
                         <span class="tech-tag">Circuit Breaker</span>
-                        <span class="tech-tag">3-Tier Caching</span>
+                        <span class="tech-tag">4-Tier Caching</span>
                         <span class="tech-tag">Blueprint Architecture</span>
                         <span class="tech-tag">Transaction Management</span>
                         <span class="tech-tag">LRU Eviction</span>
@@ -717,8 +794,10 @@
 
                 <div class="content">
                     <ul class="features-list">
+                        <li><strong>Meta-Cognitive AI Architecture:</strong> Self-improving system with mission analyst loop ($0.02 per analysis vs $10k+ RLHF), layer-specific diagnostics, and fast feedback cycles</li>
+                        <li><strong>Enterprise AI Governance:</strong> Conditional tool provisioning for role-based AI capabilities, server-side authorization preventing privilege escalation, SOC2/HIPAA-ready audit logging</li>
                         <li><strong>Custom RAG Implementation:</strong> Built retrieval-augmented generation before it was mainstream, with domain-aware filtering and effectiveness scoring</li>
-                        <li><strong>Production Engineering:</strong> Circuit breakers, caching strategies, graceful degradation, comprehensive error handling</li>
+                        <li><strong>Production Engineering:</strong> 4-tier caching achieving 90%+ hit rate with 36-48ms context assembly, circuit breakers, graceful degradation, comprehensive error handling</li>
                         <li><strong>Security Engineering:</strong> Multi-layer validation, injection prevention, sandboxed execution, audit logging</li>
                         <li><strong>Distributed Systems:</strong> 4-layer architecture with clean separation, async operations, state management</li>
                         <li><strong>Platform Thinking:</strong> Flask blueprint pattern for embeddable integration, repository pattern for data access</li>

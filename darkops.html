@@ -601,7 +601,7 @@
                     <div class="layer-card">
                         <div class="layer-number">LAYER 9</div>
                         <div class="layer-name">Field Notes</div>
-                        <div class="layer-description">Accumulated wisdom retrieved via semantic embeddings, ANN search, domain filtering, and effectiveness-based re-ranking</div>
+                        <div class="layer-description">Accumulated wisdom retrieved via hybrid search (semantic + keyword), domain filtering with relevance thresholds, deduplication, and effectiveness-based re-ranking</div>
                     </div>
 
                     <div class="layer-card">
@@ -633,10 +633,11 @@
                         </li>
                         <li>
                             <strong>Domain-Aware RAG with Retrieval Best Practices:</strong> Solves context bleeding through
-                            vector embeddings and domain-scoped retrieval. Field notes stored with semantic embeddings, retrieved
-                            via ANN (Approximate Nearest Neighbor) search, filtered by domain scope (PostgreSQL tasks only get
-                            PostgreSQL context), then re-ranked by effectiveness scores. Prevents AI confusion from irrelevant
-                            information through multi-stage retrieval pipeline.
+                            vector embeddings and domain-scoped retrieval. Domains chunked with overlap for context preservation.
+                            Field notes retrieved via hybrid search (semantic + keyword), filtered by domain scope with relevance
+                            thresholding (PostgreSQL tasks only get PostgreSQL context above quality cutoffs), deduplicated to
+                            remove redundant entries, then re-ranked by effectiveness scores. Multi-stage retrieval pipeline
+                            prevents AI confusion from irrelevant information.
                         </li>
                         <li>
                             <strong>Agent Specialization Matrix:</strong> Two-dimensional framework (Invasiveness × Caution)
@@ -798,7 +799,7 @@
                     <ul class="features-list">
                         <li><strong>Meta-Cognitive AI Architecture:</strong> Self-improving system with mission analyst loop ($0.02 per analysis vs $10k+ RLHF), layer-specific diagnostics, and fast feedback cycles</li>
                         <li><strong>Enterprise AI Governance:</strong> Conditional tool provisioning for role-based AI capabilities, server-side authorization preventing privilege escalation, SOC2/HIPAA-ready audit logging</li>
-                        <li><strong>Custom RAG Implementation:</strong> Built retrieval-augmented generation before it was mainstream, implementing vector embeddings, ANN search, domain-scoped filtering, and effectiveness-based re-ranking for multi-stage retrieval pipeline</li>
+                        <li><strong>Custom RAG Implementation:</strong> Built retrieval-augmented generation before it was mainstream, implementing chunking with overlap, hybrid search (semantic + keyword), relevance thresholding, deduplication, domain-scoped filtering, and effectiveness-based re-ranking for multi-stage retrieval pipeline</li>
                         <li><strong>Production Engineering:</strong> 4-tier caching achieving 90%+ hit rate with 36-48ms context assembly, circuit breakers, graceful degradation, comprehensive error handling</li>
                         <li><strong>Security Engineering:</strong> Multi-layer validation, injection prevention, sandboxed execution, audit logging</li>
                         <li><strong>Distributed Systems:</strong> 4-layer architecture with clean separation, async operations, state management</li>

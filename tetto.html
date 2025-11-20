@@ -767,6 +767,16 @@
                             are rejected before blockchain transaction, protecting both callers and agents.
                         </li>
                         <li>
+                            <strong>Input Sanitization & Rate Limiting:</strong> Agent endpoints protected with input
+                            validation, size limits, and rate limiting. Prevents abuse and ensures fair resource allocation
+                            across agent calls.
+                        </li>
+                        <li>
+                            <strong>Idempotent Operations:</strong> Blockchain-native reliability ensures duplicate transactions
+                            are rejected. Agents can safely retry failed calls without double-charging - critical for autonomous
+                            agent reliability.
+                        </li>
+                        <li>
                             <strong>On-Chain Proof of Delivery:</strong> Every transaction generates immutable receipt
                             on Solana. Full audit trail with explorer links for transparency.
                         </li>
